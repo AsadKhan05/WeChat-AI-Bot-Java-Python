@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- 项目基本信息 -->
+    <groupId>com.girlfriend</groupId>
+    <artifactId>bot</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>bot</name>
+    <description>AI Girlfriend Bot Backend</description>
+
+    <!-- 1. 继承 Spring Boot 父工程 (这里选用稳定的 3.x 版本) -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <!-- 2. 版本配置 -->
+    <properties>
+        <java.version>17</java.version>
+        <!-- LangChain4j 版本，确保支持 Ollama -->
+        <langchain4j.version>0.31.0</langchain4j.version>
+    </properties>
+
+    <dependencies>
+        <!-- ================= Web 模块 ================= -->
+        <!-- 提供 REST API 支持，用于接收 Python 发来的请求 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- ================= 数据库模块 ================= -->
+        <!-- Spring Data JPA: 用于简化数据库操作 (ORM) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- MySQL 驱动: 连接 MySQL 数据库 -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- ================= AI 模块 (LangChain4j) ================= -->
+        <!-- Ollama 支持: 用于连接本地运行的 Ollama 模型 -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-ollama</artifactId>
+            <version>${langchain4j.version}</version>
+        </dependency>
+
+        <!-- (可选) 如果未来想支持 OpenAI/DeepSeek，可以把下面这个解开注释 -->
+        <!--
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai</artifactId>
+            <version>${langchain4j.version}</version>
+        </dependency>
+        -->
+
+        <!-- ================= 工具模块 ================= -->
+        <!-- Lombok: 消除 Getter/Setter/Builder 等样板代码 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- ================= 测试模块 ================= -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <!-- 3. 构建插件 -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

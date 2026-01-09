@@ -1,0 +1,367 @@
+我需要的是运行的时候每个好友不是单独的打开一个对话框，而是在原界面接收消息和对话回复，并且保证能够接收到消息，并且修正错误，
+❌ 获取消息异常: 'WeChat' object has no attribute 'GetListenMessage'
+❌ 获取消息异常: 'WeChat' object has no attribute 'GetListenMessage'
+代码文件为：
+bot_manager.py文件：
+import time
+import requests
+import threading
+import queue
+import config
+import os
+from wxauto import WeChat
+
+class BotManager:
+    def __init__(self):
+        print("正在初始化微信客户端...")
+        self.wx = WeChat()
+        
+        # 消息队列
+        self.inbox_queue = queue.Queue()  # 接收消息（推给Java）
+        self.outbox_queue = queue.Queue() # 发送指令（发给微信）
+        
+        # 初始化监听
+        self._init_listeners()
+        
+        # 启动【上报】线程 (网络IO可以多线程，不影响UI)
+        threading.Thread(target=self._run_inbox_consumer, daemon=True).start()
+        
+        # ⚠️ 注意：不再启动 _run_outbox_consumer 线程
+        # 发送逻辑将合并到主循环中
+
+    def _init_listeners(self):
+        # 只需要添加监听对象，不需要传递 callback，因为我们将手动获取消息
+        for nickname in config.LISTEN_LIST:
+            self.wx.AddListenChat(nickname) #
+            print(f"✅ 已添加监听: {nickname}")
+
+    def _handle_new_messages(self):
+        """
+        手动获取监听消息，替代 KeepRunning 的自动回调
+        """
+        # GetListenMessage 返回一个字典: {chat_obj: [msg_list]}
+        msgs = self.wx.GetListenMessage() 
+        for chat, msg_list in msgs.items():
+            for msg in msg_list:
+                # 复用你之前的处理逻辑
+                self._process_single_message(msg, chat)
+
+    def _process_single_message(self, msg, chat):
+        """
+        原 _on_wx_message 的逻辑移动到这里
+        """
+        try:
+            # 1. 过滤自己和系统消息
+            if msg.sender == 'Self' or msg.sender == config.SELF_WX_NAME:
+                return
+            if msg.type == 'sys':
+                return
+
+            print(f"<-- 收到消息 [{chat.who}]: {msg.content}")
+
+            # 2. 处理下载
+            content_to_send = msg.content
+            if msg.type in ('image', 'video'):
+                save_path = msg.download() #
+                content_to_send = f"[FILE]{save_path}"
+                print(f"    文件已保存: {save_path}")
+
+            # 3. 放入上报队列
+            data = {
+                "sender": chat.who,
+                "content": content_to_send,
+                "type": msg.type,
+                "timestamp": int(time.time() * 1000)
+            }
+            self.inbox_queue.put(data)
+
+        except Exception as e:
+            print(f"❌ 消息处理异常: {e}")
+
+    def add_send_task(self, who, content):
+        """外部调用接口"""
+        self.outbox_queue.put({"who": who, "content": content})
+
+    def _process_outbox(self):
+        """
+        检查并发送队列中的消息（在主线程运行，安全）
+        """
+        while not self.outbox_queue.empty():
+            task = self.outbox_queue.get()
+            who = task['who']
+            content = task['content']
+            
+            try:
+                # 切换窗口
+                self.wx.ChatWith(who) #
+                
+                # 发送逻辑
+                if content.startswith("[FILE]"):
+                    file_path = content.replace("[FILE]", "")
+                    if os.path.exists(file_path):
+                        self.wx.SendFiles(file_path)
+                    else:
+                        print(f"❌ 文件不存在: {file_path}")
+                else:
+                    self.wx.SendMsg(content) #
+                    
+                print(f"--> 发送成功: {who} - {content[:10]}...")
+                
+            except Exception as e:
+                print(f"❌ 发送失败: {e}")
+            
+            # 简单延时，防止操作过快
+            time.sleep(0.5)
+
+    def _run_inbox_consumer(self):
+        """上报消息线程 (HTTP请求是IO密集型，可以使用独立线程)"""
+        print("📡 消息上报线程已启动")
+        while True:
+            msg_data = self.inbox_queue.get()
+            try:
+                requests.post(config.JAVA_API_URL, json=msg_data, timeout=5)
+            except Exception as e:
+                print(f"❌ 连接 Java 失败: {e}")
+            finally:
+                self.inbox_queue.task_done()
+
+    def run(self):
+        """
+        主程序入口：自定义事件循环
+        """
+        print("👀 微信监听服务运行中 (Event Loop Mode)...")
+        
+        while True:
+            try:
+                # 1. 处理待发送的消息 (优先级高)
+                self._process_outbox()
+                
+                # 2. 获取并处理新消息
+                self._handle_new_messages()
+                
+                # 3. 稍微休眠，降低 CPU 占用
+                time.sleep(1)
+                
+            except KeyboardInterrupt:
+                break
+            except Exception as e:
+                print(f"⚠️ 主循环异常: {e}")
+                time.sleep(1)
+bot_core.py
+从wxauto导入微信
+，导入时间
+，从
+bridge_java导入push_to_java
+导入配置
+，导入作系统。
+类微信机器人：
+def 开始（self）：
+print（“正在初始化微信客户端...”）
+self.wx = 微信（）
+code
+代码
+# 发送消息队列 (生产者: Flask, 消费者: 主线程)
+    self.send_queue = queue.Queue()
+    
+    self._init_listeners()
+
+def _init_listeners(self):
+    """初始化监听列表"""
+    
+    # 1. 定义一个空的回调函数
+    # 作用：仅仅是为了满足 AddListenChat 的参数要求，实际逻辑由下面的 _handle_recv_msgs 处理
+    def _dummy_callback(msg, chat):
+        pass 
+
+    for nickname in config.LISTEN_LIST:
+        # 2. 传入 callback 参数
+        self.wx.AddListenChat(nickname=nickname, callback=_dummy_callback)
+        print(f"✅ 已添加监听: {nickname}")
+
+def send_msg(self, who, content):
+    """
+    供 Server 调用：将发送任务放入队列。
+    """
+    self.send_queue.put({"who": who, "content": content})
+    print(f"[Flask -> Queue] 消息已入队，待发送给: {who}")
+
+def _handle_send_queue(self):
+    """
+    从队列处理发送任务（运行在主线程）
+    """
+    while not self.send_queue.empty():
+        try:
+            task = self.send_queue.get()
+            who = task['who']
+            content = task['content']
+
+            print(f"--> 正在发送给 {who}...")
+            
+            # 切换窗口
+            self.wx.ChatWith(who)
+            
+            # 处理文件或文本
+            if content.startswith("[FILE]"):
+                file_path = content.replace("[FILE]", "")
+                if os.path.exists(file_path):
+                    self.wx.SendFiles(file_path)
+                    print(f"    文件发送成功: {file_path}")
+                else:
+                    print(f"❌ 文件不存在: {file_path}")
+                    self.wx.SendMsg(f"错误：文件不存在 {file_path}")
+            else:
+                self.wx.SendMsg(content)
+                print(f"    文本发送成功: {content[:20]}...")
+            
+            time.sleep(0.5)
+            
+        except Exception as e:
+            print(f"❌ 发送过程出错: {e}")
+
+def _handle_recv_msgs(self):
+    """
+    获取监听消息（运行在主线程）
+    """
+    try:
+        # GetListenMessage 会去检查 AddListenChat 添加的窗口
+        msgs = self.wx.GetListenMessage()
+        
+        for chat, msg_list in msgs.items():
+            for msg in msg_list:
+                self._process_single_msg(msg, chat)
+    except Exception as e:
+        print(f"❌ 获取消息异常: {e}")
+
+def _process_single_msg(self, msg, chat):
+    """处理单条消息"""
+    if msg.sender == 'Self': 
+        return
+    if hasattr(config, 'SELF_WX_NAME') and msg.sender == config.SELF_WX_NAME:
+        return
+    if msg.type == 'sys':
+        return
+
+    print(f"<-- 收到消息 [{chat.who}]: {msg.content[:20]}...")
+
+    # 处理文件下载
+    final_content = msg.content
+    if msg.type in ('image', 'video', 'file'):
+        try:
+            save_path = msg.download()
+            final_content = f"[FILE]{save_path}"
+            print(f"    文件已下载: {save_path}")
+        except Exception as e:
+            print(f"⚠️ 下载失败: {e}")
+
+    # 推送给 Java
+    data = {
+        "sender": chat.who,
+        "content": final_content,
+        "type": msg.type,
+        "timestamp": int(time.time() * 1000)
+    }
+    push_to_java(data)
+
+def run_listener(self):
+    """主程序循环"""
+    print("🚀 微信机器人主循环已启动 (Event Loop Mode)...")
+    while True:
+        try:
+            # 1. 处理发送
+            self._handle_send_queue()
+            
+            # 2. 处理接收
+            self._handle_recv_msgs()
+            
+            # 3. 休眠
+            time.sleep(1)
+            
+        except KeyboardInterrupt:
+            print("🛑 程序停止")
+            break
+        except Exception as e:
+            print(f"⚠️ 主循环发生未知错误: {e}")
+            time.sleep(2)
+单例模式实例化
+bot = 微信机器人（）
+bridge_java.py文件
+bridge_java.py
+import requests
+import import config 
+from concurrent.futures import ThreadPoolExecutor
+创建一个最大容纳 5 个并发请求的线程池
+防止群聊消息爆发时，创建过多线程导致资源耗尽
+executor = ThreadPoolExecutor（max_workers=5）
+def _do_post（payload）：
+“”“实际执行 HTTP POST 请求的函数”“”try
+：
+# 调试输出
+content_snippet = str（payload.get（'content'， 'No Content'））[：20].replace（'\n'， ' '）
+print（f“[Python -> Java] 推送： {content_snippet}...”）
+code
+代码
+# 设置超时时间，防止网络阻塞
+    response = requests.post(config.JAVA_API_URL, json=payload, timeout=3)
+    
+    if response.status_code != 200:
+        print(f"❌ Java端返回错误: {response.status_code}, Response: {response.text[:50]}")
+except Exception as e:
+    print(f"❌ 推送 Java 失败: {e}")
+def push_to_java（msg_data）：
+“”
+“将消息推送任务提交给线程池，实现非阻塞发送。
+“”“#
+ 提交给线程池处理
+executor.submit（_do_post， msg_data）
+server.py 文件
+server.py
+from flask import Flask， request， jsonify
+from bot_core import bot
+import config
+app = Flask（名称)
+@app.route（'/send'， methods=['POST']）
+def handle_send_command（）：
+“”“接收
+ Java 的 POST 请求
+”“data
+ = request.json
+如果不是 data 或 'who' 不在 data，或 'content' 不在 data：
+return jsonify（{”status“： ”error“， ”message“： ”参数缺失“}）， 400
+code
+代码
+who = data['who']
+content = data['content']
+
+try:
+    # 这里只负责入队，不会阻塞，也不会直接操作 UI
+    bot.send_msg(who, content)
+    return jsonify({
+        "status": "queued", 
+        "message": f"消息已加入发送队列: {who}"
+    }), 200
+except Exception as e:
+    print(f"❌ 入队失败: {e}")
+    return jsonify({"status": "error", "message": str(e)}), 500
+main.py文件
+main.py
+从服务器导入应用
+导入线程
+bot_core导入机器人
+导入配置文件
+def run_flask（）：
+“”“在独立线程运行 Flask Server”“”#
+ use_reloader=False 必须加，否则 Flask 会启动两个进程导致 Main 线程逻辑跑两次
+app.run（host='0.0.0.0'， port=config.PYTHON_SERVER_PORT， debug=False， use_reloader=False）
+如果名称 == '主要角色'：
+print（“--- 启动程序 ---”）
+code
+代码
+# 1. 启动 Flask 线程 (API 服务)
+# Flask 线程只负责收 HTTP 请求并把任务 put 到 bot 的队列里
+t_flask = threading.Thread(target=run_flask, daemon=True)
+t_flask.start()
+print(f"🚀 Flask 服务器运行在端口 {config.PYTHON_SERVER_PORT}")
+
+# 2. 主线程运行 Bot 逻辑 (UI 操作)
+# 所有涉及 wxauto 的操作 (ChatWith, SendMsg, GetListenMessage) 都在这里执行
+bot.run_listener()

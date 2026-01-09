@@ -1,0 +1,44 @@
+# ================= 服务器配置 =================
+server:
+  port: 8080
+
+# ================= 数据库配置 (MySQL) =================
+spring:
+  application:
+    name: ai-girlfriend-bot
+  datasource:
+    url: jdbc:mysql://localhost:3306/ai_girlfriend?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+# ================= 线程池配置 =================
+app:
+  async:
+    core-pool-size: 5
+    max-pool-size: 10
+    queue-capacity: 25
+
+# ================= 自定义配置 (关键修改在这里) =================
+bot:
+  # Python 发消息接口
+  python-api: "http://localhost:5000/send"
+  target-user: "略略略"
+  # 🟢 普通模式模型 (Qwen 7B)
+  ai-mode: "qwen2.5:7b"
+
+  # 🔴 VIP 模式配置
+  vip-mode:
+    # 必须填完整名称 (12B 模型)
+    model: "dolphin-llama3:8b"
+    translatorModel: "qwen2.5:7b" # 专门下载这个小模型用来翻译: ollama pull qwen2.5:1.5b
+    api-url: "http://localhost:11434/api/generate"
+
+    # 4060 8G 显存的黄金参数
+    max-length: 800
+    temperature: 1.0
